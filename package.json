@@ -1,0 +1,23 @@
+{
+  "name": "pagar-me",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ya-kimura/pagar-me.git"
+  },
+  "author": "ya-kimura",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ya-kimura/pagar-me/issues"
+  },
+  "homepage": "https://github.com/ya-kimura/pagar-me#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
