@@ -1,0 +1,13 @@
+version: "3"
+
+services: 
+  app:
+    container_name: node-api
+    image: yakimura2/node-api
+    restart: unless-stopped
+    volumes:
+      - .:/usr/app 
+    command: npm start
+    ports: 
+       - "3000:3000"
+       
