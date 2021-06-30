@@ -1,0 +1,3 @@
+---
+# vars file for docker-compose
+node_image: yakimura2/node-api
