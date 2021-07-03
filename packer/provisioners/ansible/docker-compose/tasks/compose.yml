@@ -1,11 +1,16 @@
-- name: Docker compose
+---
+- name: Docker Compose
   community.docker.docker_compose:
     project_name: node-api
     definition:
       version: "2"
       services:
         app:
-          image: "{{ node_image }}"
-          ports:
-            - "8000:80"
+          image: {{ "nodezin_image" }}
           restart: always
+          command: npm start
+          ports:
+            - "8000:8080"
+          
+          
+        
