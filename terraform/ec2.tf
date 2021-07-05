@@ -3,7 +3,7 @@ data "aws_ami" "ubuntu" {
   
   filter {
     name   = "name"
-    values = ["IaaS-${var.hash_commit}"] 
+    values = ["nodezin-${var.hash_commit}"] 
   }
 
   owners = ["self"] # my user
@@ -16,7 +16,7 @@ resource "aws_instance" "web" {
   vpc_security_group_ids = ["${aws_security_group.allow_http.id}"]
  
   tags = {
-    Name = "HelloWorld"
+    Name = "iac-"
   }
 }
 
