@@ -5,7 +5,7 @@ provider "aws"{
 
 terraform {
   backend "s3" {
-    bucket = "pipe-drone"
+    bucket = "infra-as-code2"
     key    = "terraform-test.tfstate"
     region = "us-east-2"
   }
