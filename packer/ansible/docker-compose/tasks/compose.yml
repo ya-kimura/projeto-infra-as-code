@@ -1,0 +1,15 @@
+---
+- name: Docker Compose
+  community.docker.docker_compose:
+    project_name: node-api
+    definition:
+      version: "2"
+      services:
+        app:
+          image: yakimura2/nodezin
+          restart: always
+          command: npm start
+          ports:
+            - "80:8080"
+  register: output       
+
