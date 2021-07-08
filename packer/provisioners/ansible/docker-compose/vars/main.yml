@@ -1,4 +1,0 @@
----
-# vars file for docker-compose
-nodezin_image: yakimura2/node-api
-
