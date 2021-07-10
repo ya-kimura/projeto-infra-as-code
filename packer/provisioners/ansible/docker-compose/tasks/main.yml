@@ -1,3 +1,0 @@
----
-# tasks file for docker-compose
-- include: compose.yml

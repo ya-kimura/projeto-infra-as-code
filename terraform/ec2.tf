@@ -3,7 +3,7 @@ data "aws_ami" "ubuntu" {
   
   filter {
     name   = "name"
-    values = ["nodezin-${var.hash_commit}"] 
+    values = "nodezin_*"
   }
 
   owners = ["self"] # my user
@@ -12,7 +12,6 @@ data "aws_ami" "ubuntu" {
 resource "aws_instance" "web" {
   ami           = data.aws_ami.ubuntu.id
   instance_type = "t2.micro"
-  subnet_id     = "subnet-"
   vpc_security_group_ids = ["${aws_security_group.allow_http.id}"]
  
   tags = {

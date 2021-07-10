@@ -1,2 +1,0 @@
-[local]
-ec2 ansible_host=ec2-3-131-38-164.us-east-2.compute.amazonaws.com ansible_user=ubuntu ansible_ssh_private_key_file=iac-devops.pem ansible_python_interpreter=python3
