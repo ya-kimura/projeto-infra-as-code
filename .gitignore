@@ -8,3 +8,7 @@ hosts
 .terraform/
 *.tfstate*
 *.hcl
+terraform/terraform-docs
+terraform/LICENSE
+
+
