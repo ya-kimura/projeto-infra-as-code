@@ -7,6 +7,7 @@ data "aws_ami" "ubuntu" {
   }
 
   owners = ["self"] # my user
+ #owners = ["872388664293"] my user ami
 }
 
 resource "aws_instance" "web" {

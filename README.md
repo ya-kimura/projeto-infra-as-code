@@ -77,5 +77,4 @@ Ao concluir o processo, o terraform informará o output com o public_ip e dns_ip
 - Desenvolver CRUD da API nodejs
   
   #
-  
-> **Note: ** É possivel ver o funcionamento do projeto via pipeline(Github Actions).
+
