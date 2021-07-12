@@ -38,7 +38,14 @@ Fazer o export da chaves AWS:
 export AWS_ACCESS_KEY_ID=" "
 export AWS_SECRET_ACCESS_KEY=" "
 ```
+Build do packer:
+```bash
+packer build packer.pkr.hcl
+```
+>**Notes:** Antes de fazer o build, se desejar, pode rodar um validate antes. "packer validate"
 
+Após o build o packer informará o id da ami.
+#
 Executando o Terraform:
 ```bash 
 cd terraform/
