@@ -74,7 +74,7 @@ Ao concluir o processo, o terraform informará o output com o public_ip e dns_ip
 ### Todo
 - Criar Makefile
 - Adicionar step do packer no pipeline
+- Adicionar testes de infra via molécule
 - Desenvolver CRUD da API nodejs
-  
-  #
+
 
