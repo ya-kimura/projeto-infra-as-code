@@ -12,7 +12,7 @@ plugin "aws" {
 # Require specific tags for all AWS resource types that support them.
 # Ensure required billing tags
 rule "aws_resource_missing_tags" {
-  enabled = true
+  enabled = false
   tags = ["Env", "System", "SubSystem", "Team", "CreationOrigin", "Repository", "State"]
 }
 
