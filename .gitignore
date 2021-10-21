@@ -7,7 +7,7 @@ hosts
 # terraform
 .terraform/
 *.tfstate*
-*.hcl
+
 terraform/terraform-docs
 terraform/LICENSE
 
