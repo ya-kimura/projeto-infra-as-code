@@ -1,38 +1,95 @@
-name: "Terraform"
-
+name: Pull request workflow
 on:
   push:
     branches:
-      - main
+      - "main"
   pull_request:
+    branches:
+      - "main"
 
 jobs:
-  terraform:
-    name: "Unit Tests"
+  foldersChanged:
     runs-on: ubuntu-20.04
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
+     - id: file_changes
+       uses: trilom/file-changes-action@1.2.4
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v1
+     - name: Get folders
+       id: folders
+       run: |
+        content=$(jq ".[]" $HOME/files.json | grep ".tf" | sed 's/\/[^/]*$/\//' |  sed -e 's/^"//' -e 's/"$//' | grep -v '\..*' | uniq | jq -R -s -c 'split("\n")[:-1]')
+        echo "::set-output name=folders::$content"
+    outputs:
+      folders: ${{ steps.folders.outputs.folders }}
+  
+  TFLint:
+    runs-on: ubuntu-20.04
+    needs: foldersChanged
+    name: TFLint
+    if: ${{ needs.foldersChanged.outputs.folders != '[]' && needs.foldersChanged.outputs.folders != '' }}
+    strategy:
+      matrix:
+        folder: ${{ fromJson(needs.foldersChanged.outputs.folders) }}
+    steps:
+      - uses: actions/checkout@v2
+        name: Checkout code
+
+      - uses: actions/cache@v2
+        name: Cache plugin dir
+        with:
+          path: ~/.tflint.d/plugins
+          key: tflint-${{ hashFiles('.tflint.hcl') }}
+
+      - uses: terraform-linters/setup-tflint@v1
+        name: Setup TFLint
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: hashicorp/setup-terraform@v1
+        name: setup terraform
         with:
           terraform_version: 1.0.0
-          terraform_wrapper: false
 
-      - name: Terraform Format
-        id: fmt
-        run: terraform fmt -check
-        continue-on-error: true
+      - name: run TFLint
+        run: |
+          cp .tflint.hcl ${{ matrix.folder }}
+          cd ${{ matrix.folder }}
+          tflint --init
+          terraform get
+          tflint -f compact -c .tflint.hcl
 
-      - name: Terraform Init
-        id: init
-        run: terraform init
+  fmt:
+    runs-on: ubuntu-20.04
+    needs: foldersChanged
+    name: fmt
+    if: ${{ needs.foldersChanged.outputs.folders != '[]' && needs.foldersChanged.outputs.folders != '' }}
+    strategy:
+      matrix:
+        folder: ${{ fromJson(needs.foldersChanged.outputs.folders) }}
+    steps:
+      - uses: actions/checkout@v2
+        name: Checkout code
 
-      - name: Terraform Validate
-        id: validate
-        run: terraform validate -no-color
-        env:
-          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      - uses: hashicorp/setup-terraform@v1
+        name: setup terraform
+        with:
+          terraform_version: 1.0.0
 
+      - name: run terraform fmt
+        run: |
+          cd ${{ matrix.folder }}
+          terraform fmt -check=true -diff
+          
+  commitLint:
+    runs-on: ubuntu-20.04
+    needs: [TFLint, fmt]
+    if: |
+      always() &&
+      !contains(needs.*.result, 'failure') &&
+      !contains(needs.*.result, 'cancelled')
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - uses: wagoid/commitlint-github-action@v4
