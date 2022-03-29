@@ -23,7 +23,7 @@ jobs:
       folders: ${{ steps.folders.outputs.folders }}
   
   TFLint:
-    runs-on: ubuntu-20.04
+    runs-on: self-hosted
     needs: foldersChanged
     name: TFLint
     if: ${{ needs.foldersChanged.outputs.folders != '[]' && needs.foldersChanged.outputs.folders != '' }}
@@ -34,29 +34,93 @@ jobs:
       - uses: actions/checkout@v2
         name: Checkout code
 
-  #    - uses: actions/cache@v2
-  #      name: Cache plugin dir
-  #      with:
-  #        path: ~/.tflint.d/plugins
-  #        key: tflint-${{ hashFiles('.tflint.hcl') }}
-
+      - name: Create tflint file
+        id: step_one
+        run: |
+          printf 'config {
+            module = true
+            force = false
+            disabled_by_default = true
+          }
+          plugin "aws" {
+            enabled = true
+            version = "0.13.0"
+            source  = "github.com/terraform-linters/tflint-ruleset-aws"
+          }
+          rule "aws_resource_missing_tags" {
+            enabled = true
+            tags = ["Env", "System", "SubSystem", "Team", "CreationOrigin", "Repository", "State"]
+          }
+          rule "aws_s3_bucket_name" {
+            enabled = true
+            regex = "[a-z-]+-(stg|sdx|prd)$"
+            prefix = "pagarme-"
+          }
+          rule "terraform_comment_syntax" {
+            enabled = true
+          }
+          rule "terraform_deprecated_index" {
+            enabled = true
+          }
+          rule "terraform_deprecated_interpolation" {
+            enabled = true
+          }
+          rule "terraform_documented_outputs" {
+            enabled = true
+          }
+          rule "terraform_documented_variables" {
+            enabled = true
+          }
+          rule "terraform_module_pinned_source" {
+            enabled = true
+            style = "semver"
+          }
+          rule "terraform_naming_convention" {
+            enabled = true
+            format = "snake_case"
+          }
+          rule "terraform_required_providers" {
+            enabled = true
+          }
+          rule "terraform_required_version" {
+            enabled = true
+          }
+          rule "terraform_standard_module_structure" {
+            enabled = true
+          }
+          rule "terraform_typed_variables" {
+            enabled = true
+          }
+          rule "terraform_unused_declarations" {
+            enabled = true
+          }' > '.tflint.hcl'
+          #      - uses: actions/cache@v2
+          #        name: Cache plugin dir
+          #        with:
+          #          path: ~/.tflint.d/plugins
+          #          key: tflint-${{ hashFiles('.tflint.hcl') }}
+          #
       - uses: terraform-linters/setup-tflint@v1
         name: Setup TFLint
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-
-      - uses: hashicorp/setup-terraform@v1
-        name: setup terraform
+          github_token: ${{ secrets.GITHUB_TOKEN }}     
+           
+      - uses: actions/setup-node@v2
+        name: setup node
         with:
-          terraform_version: 1.0.0
+          node-version: "14"
 
       - name: run TFLint
-        run: |
+        run: |        
+          gh auth login --with-token --git-protocol "https" <<< ${{ secrets.GITHUB_TOKEN }}
+          gh auth setup-git
           cp .tflint.hcl ${{ matrix.folder }}
           cd ${{ matrix.folder }}
           tflint --init
-          terraform get
+          tfswitch
+          /home/runner/bin/terraform get
           tflint -f compact -c .tflint.hcl
+
 
   fmt:
     runs-on: ubuntu-20.04
