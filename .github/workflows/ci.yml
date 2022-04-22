@@ -58,8 +58,9 @@ jobs:
       - uses: terraform-linters/setup-tflint@v2
         name: Setup TFLint
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}     
-           
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          tflint_version: v2.0.0
+        
       - uses: actions/setup-node@v2
         name: setup node
         with:
