@@ -25,7 +25,7 @@ jobs:
       folders: ${{ steps.folders.outputs.folders }}
   
   TFLint:
-    runs-on: self-hosted
+    runs-on: ubuntu-20.04
     needs: foldersChanged
     name: TFLint
     if: ${{ needs.foldersChanged.outputs.folders != '[]' && needs.foldersChanged.outputs.folders != '' }}
@@ -59,7 +59,7 @@ jobs:
         name: Setup TFLint
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          tflint_version: v2.0.0
+          tflint_version: latest
         
       - uses: actions/setup-node@v2
         name: setup node
