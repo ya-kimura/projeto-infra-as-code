@@ -13,5 +13,5 @@ variable "vpc_cidr_block" {
 variable "az_count" {
   type        = string
   description = "The number of Availability Zones that we will deploy into"
-  default     = "2
+  default     = "2"
 }
