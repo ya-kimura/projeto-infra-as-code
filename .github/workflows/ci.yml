@@ -45,7 +45,7 @@ jobs:
 
   fmt:
     runs-on: ${{ matrix.os }}
-    needs: [TFLint, fmt]
+    needs: [TFLint]
     if: |
       always() &&
       !contains(needs.*.result, 'failure') &&
