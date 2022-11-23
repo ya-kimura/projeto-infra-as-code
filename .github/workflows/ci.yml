@@ -6,12 +6,7 @@ on:
 
 jobs:
   tflint:
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        os: [ubuntu-20.04]
-
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v3
       name: Checkout source code
@@ -37,7 +32,7 @@ jobs:
       run: tflint -f compact
           
   commitLint:
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
         with:
