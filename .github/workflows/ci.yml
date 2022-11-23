@@ -7,29 +7,14 @@ on:
     branches:
       - "main"
 
-jobs:
-  foldersChanged:
-    runs-on: ubuntu-20.04
-    steps:
-     - id: file_changes
-       uses: trilom/file-changes-action@1.2.4
-
-     - name: Get folders
-       id: folders
-       run: |
-        content=$(jq ".[]" $HOME/files.json | grep ".tf" | sed 's/\/[^/]*$/\//' |  sed -e 's/^"//' -e 's/"$//' | grep -v '\..*' | uniq | jq -R -s -c 'split("\n")[:-1]')
-        echo "::set-output name=folders::$content"
-    outputs:
-      folders: ${{ steps.folders.outputs.folders }}
-  
+jobs:  
   TFLint:
-    runs-on: ubuntu-20.04
-    needs: foldersChanged
-    name: TFLint
-    if: ${{ needs.foldersChanged.outputs.folders != '[]' && needs.foldersChanged.outputs.folders != '' }}
+    runs-on: ${{ matrix.os }}
+
     strategy:
       matrix:
-        folder: ${{ fromJson(needs.foldersChanged.outputs.folders) }}
+          os: [ubuntu-20.04]
+
     steps:
       - uses: actions/checkout@v2
         name: Checkout code
@@ -40,7 +25,7 @@ jobs:
           path: ~/.tflint.d/plugins
           key: tflint-${{ hashFiles('.tflint.hcl') }}
 
-      - uses: terraform-linters/setup-tflint@v1
+      - uses: terraform-linters/setup-tflint@v2
         name: Setup TFLint
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -52,20 +37,19 @@ jobs:
 
       - name: run TFLint
         run: |
-          cp .tflint.hcl ${{ matrix.folder }}
-          cd ${{ matrix.folder }}
+          cp .tflint.hcl ~/.tflint
+          tflint --version
           tflint --init
           terraform get
           tflint -f compact -c .tflint.hcl
 
   fmt:
-    runs-on: ubuntu-20.04
-    needs: foldersChanged
-    name: fmt
-    if: ${{ needs.foldersChanged.outputs.folders != '[]' && needs.foldersChanged.outputs.folders != '' }}
-    strategy:
-      matrix:
-        folder: ${{ fromJson(needs.foldersChanged.outputs.folders) }}
+    runs-on: ${{ matrix.os }}
+    needs: [TFLint, fmt]
+    if: |
+      always() &&
+      !contains(needs.*.result, 'failure') &&
+      !contains(needs.*.result, 'cancelled')
     steps:
       - uses: actions/checkout@v2
         name: Checkout code
@@ -77,11 +61,10 @@ jobs:
 
       - name: run terraform fmt
         run: |
-          cd ${{ matrix.folder }}
-          terraform fmt -check=true -diff
+          terraform fmt -check=true --recursive
           
   commitLint:
-    runs-on: ubuntu-20.04
+    runs-on: ${{ matrix.os }}
     needs: [TFLint, fmt]
     if: |
       always() &&

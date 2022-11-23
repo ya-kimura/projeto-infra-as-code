@@ -1,7 +1,7 @@
 config {
   module = true
   force = false
-  disabled_by_default = true
+  disabled_by_default = true´
 }
 
 plugin "aws" {
