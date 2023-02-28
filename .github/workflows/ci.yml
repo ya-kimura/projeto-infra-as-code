@@ -17,10 +17,10 @@ jobs:
         path: ~/.tflint.d/plugins
         key: ${{ matrix.os }}-tflint-${{ hashFiles('.tflint.hcl') }}
 
-    - uses: terraform-linters/setup-tflint@v2
+    - uses: terraform-linters/setup-tflint@v3
       name: Setup TFLint
       with:
-        tflint_version: v0.38.1
+        tflint_version: v0.44.1
 
     - name: Show version
       run: tflint --version
