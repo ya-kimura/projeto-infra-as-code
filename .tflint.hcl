@@ -5,8 +5,9 @@ config {
 }
 
 plugin "aws" {
-  enabled = true
-  deep_check = false
+    enabled = true
+    version = "0.21.2"
+    source  = "github.com/terraform-linters/tflint-ruleset-aws"
 }
 
 # Require specific tags for all AWS resource types that support them.
